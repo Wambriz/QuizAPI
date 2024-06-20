@@ -2,7 +2,9 @@ package com.cooksys.quiz_api.services.impl;
 
 import java.util.List;
 
+import com.cooksys.quiz_api.dtos.QuizRequestDto;
 import com.cooksys.quiz_api.dtos.QuizResponseDto;
+import com.cooksys.quiz_api.entities.Quiz;
 import com.cooksys.quiz_api.mappers.QuizMapper;
 import com.cooksys.quiz_api.repositories.QuizRepository;
 import com.cooksys.quiz_api.services.QuizService;
@@ -21,6 +23,17 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public List<QuizResponseDto> getAllQuizzes() {
     return quizMapper.entitiesToDtos(quizRepository.findAll());
+  }
+
+  @Override
+  public QuizResponseDto getQuizById(Long id) {
+    return quizMapper.entityToDto(quizRepository.findById(id).orElseThrow());
+  }
+
+  @Override
+  public QuizResponseDto createQuiz(QuizRequestDto quizRequestDto) {
+    Quiz quiz = quizMapper.requestDtoToEntity(quizRequestDto);
+    return quizMapper.entityToDto(quizRepository.saveAndFlush(quiz));
   }
 
 }
