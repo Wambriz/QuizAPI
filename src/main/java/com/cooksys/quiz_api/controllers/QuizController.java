@@ -33,4 +33,9 @@ public class QuizController {
     return quizService.createQuiz(quizRequestDto);
   }
 
+  @DeleteMapping("/{id}")
+  public QuizResponseDto deleteQuiz(@PathVariable Long id) {
+    return quizService.deleteQuiz(id);
+  }
+
 }

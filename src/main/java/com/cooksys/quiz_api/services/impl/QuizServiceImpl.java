@@ -4,8 +4,12 @@ import java.util.List;
 
 import com.cooksys.quiz_api.dtos.QuizRequestDto;
 import com.cooksys.quiz_api.dtos.QuizResponseDto;
+import com.cooksys.quiz_api.entities.Question;
 import com.cooksys.quiz_api.entities.Quiz;
+import com.cooksys.quiz_api.exceptions.ResourceNotFoundException;
 import com.cooksys.quiz_api.mappers.QuizMapper;
+import com.cooksys.quiz_api.repositories.AnswerRepository;
+import com.cooksys.quiz_api.repositories.QuestionRepository;
 import com.cooksys.quiz_api.repositories.QuizRepository;
 import com.cooksys.quiz_api.services.QuizService;
 
@@ -18,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class QuizServiceImpl implements QuizService {
 
   private final QuizRepository quizRepository;
+  private final QuestionRepository questionRepository;
+  private final AnswerRepository answerRepository;
   private final QuizMapper quizMapper;
 
   @Override
@@ -27,13 +33,32 @@ public class QuizServiceImpl implements QuizService {
 
   @Override
   public QuizResponseDto getQuizById(Long id) {
-    return quizMapper.entityToDto(quizRepository.findById(id).orElseThrow());
+    return quizMapper.entityToDto(quizRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Quiz not found with id " + id)));
   }
 
   @Override
   public QuizResponseDto createQuiz(QuizRequestDto quizRequestDto) {
     Quiz quiz = quizMapper.requestDtoToEntity(quizRequestDto);
-    return quizMapper.entityToDto(quizRepository.saveAndFlush(quiz));
+    Quiz savedQuiz = quizRepository.saveAndFlush(quiz);
+    return quizMapper.entityToDto(savedQuiz);
   }
 
+  @Override
+  public QuizResponseDto deleteQuiz(Long id) {
+    Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Quiz not found with id " + id));
+
+    // Delete associated answers first
+    for (Question question : quiz.getQuestions()) {
+      answerRepository.deleteAll(question.getAnswers());
+    }
+
+    // Delete associated questions
+    questionRepository.deleteAll(quiz.getQuestions());
+
+    // Now delete the quiz
+    quizRepository.delete(quiz);
+
+    return quizMapper.entityToDto(quiz);
+  }
 }
+
