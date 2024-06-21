@@ -2,6 +2,7 @@ package com.cooksys.quiz_api.controllers;
 
 import java.util.List;
 
+import com.cooksys.quiz_api.dtos.QuestionRequestDto;
 import com.cooksys.quiz_api.dtos.QuestionResponseDto;
 import com.cooksys.quiz_api.dtos.QuizRequestDto;
 import com.cooksys.quiz_api.dtos.QuizResponseDto;
@@ -47,6 +48,11 @@ public class QuizController {
   @GetMapping("/{id}/random")
   public QuestionResponseDto getRandomQuestion(@PathVariable Long id) {
     return quizService.getRandomQuestion(id);
+  }
+
+  @PatchMapping("/{id}/add")
+  public QuizResponseDto addQuestionToQuiz(@PathVariable Long id, @RequestBody QuestionRequestDto questionRequestDto) {
+    return quizService.addQuestionToQuiz(id, questionRequestDto);
   }
 
 }

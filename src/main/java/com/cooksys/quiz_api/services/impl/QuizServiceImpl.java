@@ -3,6 +3,7 @@ package com.cooksys.quiz_api.services.impl;
 import java.util.List;
 import java.util.Random;
 
+import com.cooksys.quiz_api.dtos.QuestionRequestDto;
 import com.cooksys.quiz_api.dtos.QuestionResponseDto;
 import com.cooksys.quiz_api.dtos.QuizRequestDto;
 import com.cooksys.quiz_api.dtos.QuizResponseDto;
@@ -83,6 +84,15 @@ public class QuizServiceImpl implements QuizService {
         Random random = new Random();
         Question randomQuestion = questions.get(random.nextInt(questions.size()));
         return questionMapper.entityToDto(randomQuestion);
+    }
+
+    @Override
+    public QuizResponseDto addQuestionToQuiz(Long id, QuestionRequestDto questionRequestDto) {
+        Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Quiz not found with id " + id));
+        Question question = questionMapper.requestDtoToEntity(questionRequestDto);
+        question.setQuiz(quiz);
+        questionRepository.saveAndFlush(question);
+        return quizMapper.entityToDto(quiz);
     }
 }
 
