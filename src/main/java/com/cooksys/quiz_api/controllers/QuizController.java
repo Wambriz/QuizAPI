@@ -38,4 +38,9 @@ public class QuizController {
     return quizService.deleteQuiz(id);
   }
 
+  @PatchMapping("/{id}/rename/{newName}")
+  public QuizResponseDto renameQuiz(@PathVariable Long id, @PathVariable String newName) {
+    return quizService.renameQuiz(id, newName);
+  }
+
 }
