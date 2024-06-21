@@ -2,6 +2,7 @@ package com.cooksys.quiz_api.services;
 
 import java.util.List;
 
+import com.cooksys.quiz_api.dtos.QuestionResponseDto;
 import com.cooksys.quiz_api.dtos.QuizRequestDto;
 import com.cooksys.quiz_api.dtos.QuizResponseDto;
 
@@ -16,4 +17,6 @@ public interface QuizService {
   QuizResponseDto deleteQuiz(Long id);
 
   QuizResponseDto renameQuiz(Long id, String newName);
+
+    QuestionResponseDto getRandomQuestion(Long id);
 }

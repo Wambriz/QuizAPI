@@ -1,12 +1,15 @@
 package com.cooksys.quiz_api.services.impl;
 
 import java.util.List;
+import java.util.Random;
 
+import com.cooksys.quiz_api.dtos.QuestionResponseDto;
 import com.cooksys.quiz_api.dtos.QuizRequestDto;
 import com.cooksys.quiz_api.dtos.QuizResponseDto;
 import com.cooksys.quiz_api.entities.Question;
 import com.cooksys.quiz_api.entities.Quiz;
 import com.cooksys.quiz_api.exceptions.ResourceNotFoundException;
+import com.cooksys.quiz_api.mappers.QuestionMapper;
 import com.cooksys.quiz_api.mappers.QuizMapper;
 import com.cooksys.quiz_api.repositories.AnswerRepository;
 import com.cooksys.quiz_api.repositories.QuestionRepository;
@@ -25,6 +28,7 @@ public class QuizServiceImpl implements QuizService {
   private final QuestionRepository questionRepository;
   private final AnswerRepository answerRepository;
   private final QuizMapper quizMapper;
+  private final QuestionMapper questionMapper;
 
   @Override
   public List<QuizResponseDto> getAllQuizzes() {
@@ -68,5 +72,17 @@ public class QuizServiceImpl implements QuizService {
     Quiz updatedQuiz = quizRepository.saveAndFlush(quiz);
     return quizMapper.entityToDto(updatedQuiz);
   }
+
+    @Override
+    public QuestionResponseDto getRandomQuestion(Long id) {
+        Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Quiz not found with id " + id));
+        List<Question> questions = quiz.getQuestions();
+        if (questions.isEmpty()) {
+          throw new ResourceNotFoundException("No Questions found for quiz with id " + id);
+        }
+        Random random = new Random();
+        Question randomQuestion = questions.get(random.nextInt(questions.size()));
+        return questionMapper.entityToDto(randomQuestion);
+    }
 }
 
