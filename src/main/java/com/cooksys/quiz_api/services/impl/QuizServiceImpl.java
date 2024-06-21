@@ -94,5 +94,22 @@ public class QuizServiceImpl implements QuizService {
         questionRepository.saveAndFlush(question);
         return quizMapper.entityToDto(quiz);
     }
+
+    @Override
+    public QuestionResponseDto deleteQuestionFromQuiz(Long id, Long questionID) {
+        Quiz quiz = quizRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Quiz not found with id " + id));
+        Question question = questionRepository.findById(questionID).orElseThrow(() -> new ResourceNotFoundException("Question not found with id " + questionID));
+        // List<questions>
+        if (!quiz.getQuestions().contains(question)) {
+            throw new ResourceNotFoundException("Question with id " + questionID + "does not belong to quiz with id " + id);
+        }
+        // delete question's answers
+        answerRepository.deleteAll(question.getAnswers());
+
+        // remove question from quiz
+        quiz.getQuestions().remove(question);
+        questionRepository.delete(question);
+        return questionMapper.entityToDto(question);
+    }
 }
 
